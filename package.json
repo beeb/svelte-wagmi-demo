@@ -11,14 +11,24 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-vercel": "^5.5.0",
-		"@sveltejs/kit": "^2.0.0",
-		"@sveltejs/vite-plugin-svelte": "^4.0.0",
+		"@biomejs/biome": "^1.9.4",
+		"@sveltejs/adapter-auto": "^3.3.1",
+		"@sveltejs/kit": "^2.15.0",
+		"@sveltejs/vite-plugin-svelte": "^4.0.4",
+		"@wagmi/connectors": "^5.7.2",
+		"@wagmi/core": "^2.16.2",
 		"autoprefixer": "^10.4.20",
-		"svelte": "^5.0.0",
-		"svelte-check": "^4.0.0",
-		"tailwindcss": "^3.4.9",
-		"typescript": "^5.0.0",
+		"svelte": "^5.15.0",
+		"svelte-check": "^4.1.1",
+		"tailwindcss": "^3.4.17",
+		"typescript": "^5.7.2",
+		"viem": "~2.21.57",
 		"vite": "^5.4.11"
+	},
+	"pnpm": {
+		"overrides": {
+			"svelte-i18n": "^4.0.0",
+			"intl-messageformat": "^10.5.1"
+		}
 	}
 }
