@@ -3,32 +3,23 @@
   import { injected } from "@wagmi/connectors";
   import { connect, getAccount, http, createConfig } from "@wagmi/core";
   import { untrack } from "svelte";
+  import { Wagmi } from "$lib/index.svelte";
 
-  const config = $state(
-    createConfig({
-      chains: [mainnet, sepolia],
-      transports: {
-        [mainnet.id]: http(),
-        [sepolia.id]: http(),
-      },
-    }),
-  );
-  const { address } = $derived(getAccount(config));
+  const wagmi = new Wagmi({
+    chains: [mainnet, sepolia],
+    transports: {
+      [mainnet.id]: http(),
+      [sepolia.id]: http(),
+    },
+  });
 
   $effect(() => {
     (async () => {
-      try {
-        await connect(
-          untrack(() => config),
-          { connector: injected() },
-        );
-      } catch (err) {
-        console.error(err);
-      }
+      await wagmi.connect();
     })();
   });
 </script>
 
 <h1>Welcome to SvelteKit</h1>
 
-<div>{address}</div>
+<div>{wagmi.account.address}</div>
