@@ -1,25 +1,23 @@
 <script lang="ts">
-  import { mainnet, sepolia } from "@wagmi/core/chains";
-  import { injected } from "@wagmi/connectors";
-  import { connect, getAccount, http, createConfig } from "@wagmi/core";
-  import { untrack } from "svelte";
-  import { Wagmi } from "$lib/index.svelte";
+  import { Wagmi } from '$lib/index.svelte'
 
-  const wagmi = new Wagmi({
-    chains: [mainnet, sepolia],
-    transports: {
-      [mainnet.id]: http(),
-      [sepolia.id]: http(),
-    },
-  });
+  const wagmi = Wagmi.getInstance()
 
   $effect(() => {
-    (async () => {
-      await wagmi.connect();
-    })();
-  });
+    ;(async () => {
+      await wagmi.reconnect()
+    })()
+  })
+
+  async function connect() {
+    await wagmi.connect()
+  }
 </script>
 
 <h1>Welcome to SvelteKit</h1>
 
-<div>{wagmi.account.address}</div>
+{#if wagmi.connections.length > 0}
+  <div>{wagmi.account.address}</div>
+{:else}
+  <div><button onclick={() => connect()}>Connect</button></div>
+{/if}
