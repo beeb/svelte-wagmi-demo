@@ -1,5 +1,6 @@
 import {
 	http,
+	type Connector,
 	type CreateConfigParameters,
 	type GetAccountReturnType,
 	connect,
@@ -7,6 +8,7 @@ import {
 	disconnect,
 	getBlockNumber,
 	getChainId,
+	getConnectors,
 	reconnect,
 	watchAccount,
 	watchBlockNumber,
@@ -39,6 +41,7 @@ export class Wagmi {
 		status: "disconnected",
 	});
 	blockNumber = $state<bigint>();
+	connectors = $derived(getConnectors(this.config));
 
 	private constructor(config: CreateConfigParameters) {
 		this.config = createConfig(config);
@@ -84,9 +87,9 @@ export class Wagmi {
 		await reconnect(this.config);
 	};
 
-	connect = async () => {
+	connect = async (connector: Connector) => {
 		await connect(this.config, {
-			connector: this.config.connectors[0],
+			connector,
 		});
 	};
 

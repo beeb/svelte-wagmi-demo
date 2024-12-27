@@ -14,7 +14,7 @@
       [sepolia.id]: http(),
       [arbitrum.id]: http()
     },
-    connectors: [metaMask()]
+    connectors: [metaMask(), injected()]
   })
 </script>
 
