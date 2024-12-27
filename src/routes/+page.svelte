@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Wagmi } from '$lib/index.svelte'
+  import { untrack } from 'svelte'
 
   const wagmi = Wagmi.getInstance()
 
@@ -8,16 +9,14 @@
       await wagmi.reconnect()
     })()
   })
-
-  async function connect() {
-    await wagmi.connect()
-  }
 </script>
 
-<h1>Welcome to SvelteKit</h1>
+chain ID {wagmi.chainId} at block {wagmi.blockNumber}
 
-{#if wagmi.connections.length > 0}
-  <div>{wagmi.account.address}</div>
-{:else}
-  <div><button onclick={() => connect()}>Connect</button></div>
+<div>{wagmi.account.status} {wagmi.account.address}</div>
+{#if wagmi.account.isDisconnected}
+  <div><button onclick={async () => await wagmi.connect()}>Connect</button></div>
+{/if}
+{#if wagmi.account.isConnected}
+  <div><button onclick={async () => await wagmi.disconnect()}>Disconnect</button></div>
 {/if}
