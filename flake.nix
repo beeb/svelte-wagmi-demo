@@ -16,11 +16,10 @@
           packages = with pkgs; [
             nodejs-slim
             nodePackages.pnpm
-            # typescript
           ];
-          # shellHook = ''
-          #   set -a; source .env; set +a
-          # '';
+          shellHook = ''
+            set -a; source .env; set +a
+          '';
         };
       });
 }

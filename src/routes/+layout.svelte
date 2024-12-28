@@ -1,20 +1,28 @@
 <script lang="ts">
-  import { Wagmi } from '$lib/index.svelte'
-  import { arbitrum, mainnet, sepolia } from '@wagmi/core/chains'
-  import { http, injected } from '@wagmi/core'
-  import { metaMask } from '@wagmi/connectors'
+  import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+  import { mainnet, arbitrum } from '@reown/appkit/networks'
+  import { PUBLIC_APPKIT_PROJECT_ID } from '$env/static/public'
+  import { Web3 } from '$lib/web3.svelte'
   import '../app.css'
 
   const { children } = $props()
 
-  Wagmi.init({
-    chains: [mainnet, sepolia, arbitrum],
-    transports: {
-      [mainnet.id]: http(),
-      [sepolia.id]: http(),
-      [arbitrum.id]: http()
+  const wagmiAdapter = new WagmiAdapter({
+    projectId: PUBLIC_APPKIT_PROJECT_ID,
+    networks: [mainnet, arbitrum]
+  })
+  Web3.init(wagmiAdapter, {
+    networks: [mainnet, arbitrum],
+    metadata: {
+      name: 'Test',
+      description: 'Test',
+      url: 'https://test.com',
+      icons: ['https://test.com/icon.png']
     },
-    connectors: [metaMask(), injected()]
+    projectId: PUBLIC_APPKIT_PROJECT_ID,
+    features: {
+      analytics: false
+    }
   })
 </script>
 
