@@ -41,7 +41,7 @@
     <appkit-button></appkit-button>
   </div>
   {#await balance}
-    Loading balance...
+    <div>Loading balance...</div>
   {:then bal}
     <div>USDT balance on chain {web3.chainId}: {formatUnits(bal, decimals)}</div>
   {/await}
