@@ -21,6 +21,9 @@ importers:
       '@reown/appkit-adapter-wagmi':
         specifier: ^1.6.2
         version: 1.6.2(pp6vf3vzr5xhcfrutuzhstlwj4)
+      '@reown/appkit-common':
+        specifier: ^1.6.2
+        version: 1.6.2(bufferutil@4.0.9)(typescript@5.7.2)(utf-8-validate@5.0.10)(zod@3.22.4)
       '@sveltejs/adapter-auto':
         specifier: ^3.3.1
         version: 3.3.1(@sveltejs/kit@2.15.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.16.0)(vite@5.4.11))(svelte@5.16.0)(vite@5.4.11))

@@ -1,7 +1,13 @@
 import { browser } from "$app/environment";
-import { type AppKit, type AppKitOptions, createAppKit } from "@reown/appkit";
+import {
+	type AccountControllerState,
+	type AppKit,
+	type AppKitOptions,
+	type ThemeMode,
+	createAppKit,
+} from "@reown/appkit";
 import type { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import type { Address } from "viem";
+import type { CaipNetwork, ChainNamespace } from "@reown/appkit-common";
 
 export class Web3 {
 	private static instance: Web3;
@@ -9,8 +15,15 @@ export class Web3 {
 	adapter: WagmiAdapter;
 	modal: AppKit | undefined;
 
-	chainId = $state<string | number>();
-	address = $state<Address>();
+	initialized = $state(false);
+	loading = $state(false);
+	open = $state(false); // Modal open state
+	activeChain = $state<ChainNamespace>(); // 'eip155' | 'solana' | 'polkadot' | 'bip122'
+	network = $state<CaipNetwork>();
+	isConnected = $state(false);
+	status = $state<AccountControllerState["status"]>("disconnected");
+	address = $state<string>(); // Connected wallet address
+	themeMode = $state<ThemeMode>("light");
 
 	private constructor(
 		adapter: WagmiAdapter,
@@ -24,11 +37,23 @@ export class Web3 {
 				...options,
 			});
 
-			this.modal.subscribeAccount((newState) => {
-				this.address = newState.address as Address | undefined;
+			this.modal.subscribeAccount((account) => {
+				this.address = account.address;
+				this.isConnected = account.isConnected;
+				this.status = account.status;
 			});
-			this.modal.subscribeNetwork((newState) => {
-				this.chainId = newState.chainId;
+			this.modal.subscribeNetwork((network) => {
+				this.network = network.caipNetwork;
+			});
+			this.modal.subscribeState((state) => {
+				this.activeChain = state.activeChain;
+				this.initialized = state.initialized;
+				this.loading = state.loading;
+				this.open = state.open;
+			});
+			this.themeMode = this.modal.getThemeMode();
+			this.modal.subscribeTheme((theme) => {
+				this.themeMode = theme.themeMode;
 			});
 		}
 	}
