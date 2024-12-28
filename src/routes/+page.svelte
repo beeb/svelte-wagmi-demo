@@ -12,7 +12,7 @@
   const web3 = Web3.getInstance()
 
   let decimals = $state(6)
-  const usdtAddress = $derived(addresses.get(web3.chainId ?? 1) || '0xdac17f958d2ee523a2206206994597c13d831ec7')
+  const usdtAddress = $derived(web3.chainId ? addresses.get(web3.chainId) : undefined)
   const balance = $derived(updateBalance(usdtAddress, web3.address))
 
   async function updateDecimals(token: Address) {
@@ -23,7 +23,8 @@
     })
   }
 
-  async function updateBalance(token: Address, account: Address | undefined) {
+  async function updateBalance(token: Address | undefined, account: Address | undefined) {
+    if (!token) return 0n
     await updateDecimals(token)
     if (!account) return 0n
     return await readContract(web3.adapter.wagmiConfig, {
@@ -40,9 +41,13 @@
     <h1 class="text-4xl font-bold flex-grow">Demo</h1>
     <appkit-button></appkit-button>
   </div>
-  {#await balance}
-    <div>Loading balance...</div>
-  {:then bal}
-    <div>USDT balance on chain {web3.chainId}: {formatUnits(bal, decimals)}</div>
-  {/await}
+  {#if web3.address}
+    {#await balance}
+      <div>Loading balance...</div>
+    {:then bal}
+      <div>USDT balance on chain {web3.chainId}: {formatUnits(bal, decimals)}</div>
+    {:catch error}
+      <div>Error while loading balance: {error.message}</div>
+    {/await}
+  {/if}
 </div>
