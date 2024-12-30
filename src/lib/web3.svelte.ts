@@ -6,13 +6,22 @@ import {
 	type ThemeMode,
 	createAppKit,
 } from "@reown/appkit";
+import type { SolanaAdapter } from "@reown/appkit-adapter-solana";
 import type { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import type { CaipNetwork, ChainNamespace } from "@reown/appkit-common";
+import type { Connection } from "@solana/web3.js";
+
+export type Web3Args = {
+	evmAdapter?: WagmiAdapter;
+	solanaAdapter?: SolanaAdapter;
+	appkitOptions: Omit<AppKitOptions, "adapters">;
+};
 
 export class Web3 {
 	private static instance: Web3;
 
-	adapter: WagmiAdapter;
+	evm: WagmiAdapter | undefined;
+	solana: SolanaAdapter | undefined;
 	appkit: AppKit | undefined;
 
 	initialized = $state(false);
@@ -25,16 +34,16 @@ export class Web3 {
 	address = $state<string>(); // Connected wallet address
 	themeMode = $state<ThemeMode>("light");
 
-	private constructor(
-		adapter: WagmiAdapter,
-		options: Omit<AppKitOptions, "adapters">,
-	) {
-		this.adapter = adapter;
+	private constructor(options: Web3Args) {
+		this.evm = options.evmAdapter;
+		this.solana = options.solanaAdapter;
 
 		if (browser) {
 			this.appkit = createAppKit({
-				adapters: [adapter],
-				...options,
+				adapters: [options.evmAdapter, options.solanaAdapter].filter(
+					(item) => item !== undefined,
+				),
+				...options.appkitOptions,
 			});
 
 			this.appkit.subscribeAccount((account) => {
@@ -58,12 +67,9 @@ export class Web3 {
 		}
 	}
 
-	public static init(
-		adapter: WagmiAdapter,
-		options: Omit<AppKitOptions, "adapters">,
-	) {
+	public static init(options: Web3Args) {
 		if (!Web3.instance) {
-			Web3.instance = new Web3(adapter, options);
+			Web3.instance = new Web3(options);
 		}
 		return Web3.instance;
 	}
@@ -76,6 +82,17 @@ export class Web3 {
 	}
 
 	get wagmi() {
-		return this.adapter.wagmiConfig;
+		if (!this.evm) {
+			throw new Error("EVM/Wagmi adapter not initialized");
+		}
+		return this.evm.wagmiConfig;
+	}
+
+	get solConnection(): Connection | undefined {
+		if (!this.solana) {
+			throw new Error("Solana adapter not initialized");
+		}
+		// need to wait for a fix https://github.com/reown-com/appkit/issues/3553
+		return undefined;
 	}
 }

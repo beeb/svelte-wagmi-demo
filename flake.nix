@@ -13,6 +13,8 @@
       in
       {
         devShells.default = pkgs.mkShell {
+          nativeBuildInputs = with pkgs; [ pkg-config ];
+          buildInputs = with pkgs; [ udev ]; # for @solana/wallet-adapter-wallets
           packages = with pkgs; [
             nodejs-slim
             nodePackages.pnpm
