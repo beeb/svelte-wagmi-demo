@@ -75,7 +75,7 @@ export class Web3 {
 		return Web3.instance;
 	}
 
-	get config() {
+	get wagmi() {
 		return this.adapter.wagmiConfig;
 	}
 }
