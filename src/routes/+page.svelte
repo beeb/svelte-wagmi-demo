@@ -70,7 +70,7 @@
     {#await balance}
       <div>Loading balance...</div>
     {:then { balance: bal, decimals }}
-      <div>USDT balance on chain {web3.network?.id}: {formatUnits(bal, decimals)}</div>
+      <div>USDT balance on chain {web3.network?.name}: {formatUnits(bal, decimals)}</div>
     {:catch error}
       <div>Error while loading balance: {error.message}</div>
     {/await}
