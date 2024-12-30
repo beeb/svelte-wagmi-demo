@@ -16,7 +16,7 @@
   const balance = $derived(usdtAddress && web3.address ? updateBalance(usdtAddress, web3.address) : 0n)
 
   async function updateDecimals(token: Address) {
-    decimals = await readContract(web3.adapter.wagmiConfig, {
+    decimals = await readContract(web3.config, {
       abi: parseAbi(['function decimals() view returns (uint8)']),
       address: token,
       functionName: 'decimals'
@@ -29,7 +29,7 @@
     if (!token) return 0n
     await updateDecimals(token)
     if (web3.network?.chainNamespace !== 'eip155' || !isAddress(account)) return 0n
-    return await readContract(web3.adapter.wagmiConfig, {
+    return await readContract(web3.config, {
       abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
       address: token,
       functionName: 'balanceOf',

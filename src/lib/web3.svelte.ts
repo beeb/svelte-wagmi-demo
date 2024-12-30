@@ -13,7 +13,7 @@ export class Web3 {
 	private static instance: Web3;
 
 	adapter: WagmiAdapter;
-	modal: AppKit | undefined;
+	appkit: AppKit | undefined;
 
 	initialized = $state(false);
 	loading = $state(false);
@@ -32,27 +32,27 @@ export class Web3 {
 		this.adapter = adapter;
 
 		if (browser) {
-			this.modal = createAppKit({
+			this.appkit = createAppKit({
 				adapters: [adapter],
 				...options,
 			});
 
-			this.modal.subscribeAccount((account) => {
+			this.appkit.subscribeAccount((account) => {
 				this.address = account.address;
 				this.isConnected = account.isConnected;
 				this.status = account.status;
 			});
-			this.modal.subscribeNetwork((network) => {
+			this.appkit.subscribeNetwork((network) => {
 				this.network = network.caipNetwork;
 			});
-			this.modal.subscribeState((state) => {
+			this.appkit.subscribeState((state) => {
 				this.activeChain = state.activeChain;
 				this.initialized = state.initialized;
 				this.loading = state.loading;
 				this.open = state.open;
 			});
-			this.themeMode = this.modal.getThemeMode();
-			this.modal.subscribeTheme((theme) => {
+			this.themeMode = this.appkit.getThemeMode();
+			this.appkit.subscribeTheme((theme) => {
 				this.themeMode = theme.themeMode;
 			});
 		}
@@ -73,5 +73,9 @@ export class Web3 {
 			throw new Error("Web3 not initialized");
 		}
 		return Web3.instance;
+	}
+
+	get config() {
+		return this.adapter.wagmiConfig;
 	}
 }
