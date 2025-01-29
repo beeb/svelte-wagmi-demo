@@ -6,10 +6,14 @@ import {
 	type ThemeMode,
 	createAppKit,
 } from "@reown/appkit";
-import type { SolanaAdapter } from "@reown/appkit-adapter-solana";
+import {
+	type SolanaAdapter,
+	SolHelpersUtil,
+} from "@reown/appkit-adapter-solana";
+import { solana } from "@reown/appkit/networks";
 import type { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import type { CaipNetwork, ChainNamespace } from "@reown/appkit-common";
-import type { Connection } from "@solana/web3.js";
+import { Connection } from "@solana/web3.js";
 
 export type Web3Args = {
 	evmAdapter?: WagmiAdapter;
@@ -19,6 +23,7 @@ export type Web3Args = {
 
 export class Web3 {
 	private static instance: Web3;
+	private projectId: string;
 
 	evm: WagmiAdapter | undefined;
 	solana: SolanaAdapter | undefined;
@@ -35,6 +40,7 @@ export class Web3 {
 	themeMode = $state<ThemeMode>("light");
 
 	private constructor(options: Web3Args) {
+		this.projectId = options.appkitOptions.projectId;
 		this.evm = options.evmAdapter;
 		this.solana = options.solanaAdapter;
 
@@ -88,11 +94,14 @@ export class Web3 {
 		return this.evm.wagmiConfig;
 	}
 
-	get solConnection(): Connection | undefined {
+	get solConnection() {
 		if (!this.solana) {
 			throw new Error("Solana adapter not initialized");
 		}
-		// need to wait for a fix https://github.com/reown-com/appkit/issues/3553
-		return undefined;
+		if (this.network?.chainNamespace !== "solana") {
+			throw new Error("Connected network is not in the Solana namespace");
+		}
+		const rpcUrl = this.network.rpcUrls.default.http[0];
+		return new Connection(rpcUrl, "confirmed");
 	}
 }

@@ -14,7 +14,7 @@
       {
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [ pkg-config ];
-          buildInputs = with pkgs; [ udev ]; # for @solana/wallet-adapter-wallets
+          buildInputs = with pkgs; lib.optionals stdenv.isLinux [ udev ]; # for @solana/wallet-adapter-wallets
           packages = with pkgs; [
             nodejs-slim
             nodePackages.pnpm
