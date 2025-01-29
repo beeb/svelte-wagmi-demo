@@ -49,7 +49,7 @@
       });
       return { balance, decimals };
     }
-    if (web3.network?.chainNamespace === "solana" && web3.solConnection) {
+    if (web3.solConnection) {
       const tokenAddress = new PublicKey(token);
       const tokenAccount = (
         await web3.solConnection.getTokenAccountsByOwner(

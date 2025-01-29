@@ -6,11 +6,7 @@ import {
 	type ThemeMode,
 	createAppKit,
 } from "@reown/appkit";
-import {
-	type SolanaAdapter,
-	SolHelpersUtil,
-} from "@reown/appkit-adapter-solana";
-import { solana } from "@reown/appkit/networks";
+import type { SolanaAdapter } from "@reown/appkit-adapter-solana";
 import type { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import type { CaipNetwork, ChainNamespace } from "@reown/appkit-common";
 import { Connection } from "@solana/web3.js";
@@ -23,7 +19,6 @@ export type Web3Args = {
 
 export class Web3 {
 	private static instance: Web3;
-	private projectId: string;
 
 	evm: WagmiAdapter | undefined;
 	solana: SolanaAdapter | undefined;
@@ -34,13 +29,13 @@ export class Web3 {
 	open = $state(false); // Modal open state
 	activeChain = $state<ChainNamespace>(); // 'eip155' | 'solana' | 'polkadot' | 'bip122'
 	network = $state<CaipNetwork>();
+	solConnection = $state<Connection>();
 	isConnected = $state(false);
 	status = $state<AccountControllerState["status"]>("disconnected");
 	address = $state<string>(); // Connected wallet address
 	themeMode = $state<ThemeMode>("light");
 
 	private constructor(options: Web3Args) {
-		this.projectId = options.appkitOptions.projectId;
 		this.evm = options.evmAdapter;
 		this.solana = options.solanaAdapter;
 
@@ -59,6 +54,7 @@ export class Web3 {
 			});
 			this.appkit.subscribeNetwork((network) => {
 				this.network = network.caipNetwork;
+				this.updateSolConnection();
 			});
 			this.appkit.subscribeState((state) => {
 				this.activeChain = state.activeChain;
@@ -71,6 +67,15 @@ export class Web3 {
 				this.themeMode = theme.themeMode;
 			});
 		}
+	}
+
+	private updateSolConnection() {
+		if (!this.solana || this.network?.chainNamespace !== "solana") {
+			this.solConnection = undefined;
+			return;
+		}
+		const rpcUrl = this.network.rpcUrls.default.http[0];
+		this.solConnection = new Connection(rpcUrl, "confirmed");
 	}
 
 	public static init(options: Web3Args) {
@@ -92,16 +97,5 @@ export class Web3 {
 			throw new Error("EVM/Wagmi adapter not initialized");
 		}
 		return this.evm.wagmiConfig;
-	}
-
-	get solConnection() {
-		if (!this.solana) {
-			throw new Error("Solana adapter not initialized");
-		}
-		if (this.network?.chainNamespace !== "solana") {
-			throw new Error("Connected network is not in the Solana namespace");
-		}
-		const rpcUrl = this.network.rpcUrls.default.http[0];
-		return new Connection(rpcUrl, "confirmed");
 	}
 }
