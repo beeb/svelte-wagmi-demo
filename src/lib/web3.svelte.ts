@@ -9,7 +9,11 @@ import {
 import type { SolanaAdapter } from "@reown/appkit-adapter-solana";
 import type { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import type { CaipNetwork, ChainNamespace } from "@reown/appkit-common";
-import { Connection } from "@solana/web3.js";
+import {
+	type Rpc,
+	type SolanaRpcApiMainnet,
+	createSolanaRpc,
+} from "@solana/kit";
 
 export type Web3Args = {
 	evmAdapter?: WagmiAdapter;
@@ -29,7 +33,7 @@ export class Web3 {
 	open = $state(false); // Modal open state
 	activeChain = $state<ChainNamespace>(); // 'eip155' | 'solana' | 'polkadot' | 'bip122'
 	network = $state<CaipNetwork>();
-	solConnection = $state<Connection>();
+	solRpc = $state<Rpc<SolanaRpcApiMainnet>>();
 	isConnected = $state(false);
 	status = $state<AccountControllerState["status"]>("disconnected");
 	address = $state<string>(); // Connected wallet address
@@ -71,11 +75,11 @@ export class Web3 {
 
 	private updateSolConnection() {
 		if (!this.solana || this.network?.chainNamespace !== "solana") {
-			this.solConnection = undefined;
+			this.solRpc = undefined;
 			return;
 		}
 		const rpcUrl = this.network.rpcUrls.default.http[0];
-		this.solConnection = new Connection(rpcUrl, "confirmed");
+		this.solRpc = createSolanaRpc(rpcUrl);
 	}
 
 	public static init(options: Web3Args) {
