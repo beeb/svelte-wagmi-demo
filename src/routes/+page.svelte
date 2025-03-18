@@ -76,7 +76,7 @@
 
 <div class="container mx-auto mt-4">
   <div class="flex mb-8">
-    <h1 class="text-4xl font-bold flex-grow">Demo</h1>
+    <h1 class="text-4xl font-bold grow">Demo</h1>
     <appkit-button></appkit-button>
   </div>
   {#if web3.isConnected}
